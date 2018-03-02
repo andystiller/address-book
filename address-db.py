@@ -9,6 +9,9 @@ import sqlite3
 DATABASE_PATH = "data/addressbook.db"
 
 class AddressDatabase(object):
+    """
+    The AddressDatabase Class handles creating, acessing a writing to the address sqlite database
+    """
     def __init__(self, db_path = DATABASE_PATH):
         self._db_conn = None
         self._db_path = db_path
@@ -21,6 +24,9 @@ class AddressDatabase(object):
         self._db_conn.close
 
     def opendb(self):
+        """
+        Method to open the database and create it if required 
+        """
         path_exists = os.path.exists(self._db_path)
 
         self._db_conn = sqlite3.connect(self._db_path)
@@ -33,8 +39,7 @@ class AddressDatabase(object):
         """
         Method to create the blank tables in the dabase.
         """
-
-        #Create Address table
+        #Create contacts table
         with self._db_conn:
             self._db_conn.execute('''CREATE TABLE  IF NOT EXISTS contacts
                             (full_name TEXT,  
@@ -60,6 +65,9 @@ class AddressDatabase(object):
         return exists
 
     def insert(self, fullname, phone, email, address):
+        """
+        Method to insert a new contact in the dabase.
+        """
         cursor = self._db_conn.cursor()
         cursor.execute('''INSERT INTO contacts(full_name, phone, email, address)
                   VALUES(?,?,?,?)''', (fullname, phone, email, address))
