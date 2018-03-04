@@ -8,52 +8,49 @@ import os, sys, getopt, json
 
 FILE_PATH = "data/contacts.json"
 
-def process_addressbook(address_file):
-    pass
-
-def list_addresses(filepath):
+def open_addressbook(filepath):
     path_exists = os.path.exists(filepath)
-    loaded = True
+    addressbook = None
 
     if path_exists:
         with open(filepath, 'r') as infile:
-            contacts = json.load(infile)
-            print(contacts)
-    else:
-        loaded = False
+            addressbook = json.load(infile)
+            print(addressbook)
 
-    return loaded
+    return addressbook
+
+def list_addresses(filepath):
+    addressbook = open_addressbook(filepath)
+    print(addressbook)
 
 def find_address(filepath, contact):
     pass
 
 def add_address(filepath):
     new_contact = {}
-    print(filepath)
-    path_exists = os.path.exists(filepath)
 
     fullname = input('Please enter the contact name: ')
     print(fullname)
 
-    if path_exists:
-        open_mode = 'r+'
-    else:
-        print('Creating new address book')
-        contacts = []
-        addressbook = {'filetype':'Addressbook','application':'address-cli.py', 'contacts': contacts}
-        open_mode = 'w'
-
+    # Have we got a name to add?
     if fullname:
         new_contact['name'] = fullname
         new_contact['phone'] = str(input('Please enter their phone number: '))
         new_contact['address'] = input('Please enter their address: ')
 
+        # Try to open the current addressbook
+        addressbook = open_addressbook(filepath)
+
+        if addressbook is None:
+            # If there was no addressbook create one
+            print('Creating new address book')
+            contacts = []
+            addressbook = {'filetype':'Addressbook','application':'address-cli.py', 'contacts': contacts}
+
         print(new_contact)
-        with open(filepath, open_mode) as outfile:
+        with open(filepath, 'w') as outfile:
+            # Write the output file with the new contact
             print(outfile)
-            if path_exists:
-                addressbook = json.load(outfile)
-            
             addressbook['contacts'].append(new_contact)
             print(addressbook)
             json.dump(addressbook, outfile)
