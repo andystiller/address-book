@@ -9,6 +9,10 @@ import os, sys, getopt, json
 FILE_PATH = "data/contacts.json"
 
 def open_addressbook(filepath):
+    """
+    Function to open the address book file specified
+    Returns the addressbook or None
+    """
     path_exists = os.path.exists(filepath)
     addressbook = None
 
@@ -19,6 +23,10 @@ def open_addressbook(filepath):
     return addressbook
 
 def list_contacts(filepath):
+    """
+    Function to list contact details in the addressbook
+    Returns 
+    """
     addressbook = open_addressbook(filepath)
     
     if addressbook:
@@ -28,6 +36,10 @@ def list_contacts(filepath):
         print('No address book found!')
 
 def retrieve_contact(filepath, name):
+    """
+    Function to retirve specified contact details in the addressbook
+    Returns a contact or None
+    """
     contact_details = None
     addressbook = open_addressbook(filepath)
     print('Finding ', name)
@@ -43,10 +55,13 @@ def retrieve_contact(filepath, name):
     print('Name: ' + contact_details['name'], 'Telephone: ' + contact_details['phone'], 
         'Address: ' + contact_details['address'], sep='\t', end='\n' )
     return contact_details
-            
-
 
 def add_contact(filepath):
+    """
+    Function to add contact details to the addressbook
+    It take user input and creates a contact that is added
+    Returns 
+    """
     new_contact = {}
     fullname = input('Please enter the contact name: ')
     print(fullname)
@@ -69,13 +84,14 @@ def add_contact(filepath):
         print(new_contact)
         with open(filepath, 'w') as outfile:
             # Write the output file with the new contact
-            print(outfile)
             addressbook['contacts'].append(new_contact)
-            print(addressbook)
             json.dump(addressbook, outfile)
 
-
 def remove_contact(filepath, name):
+    """
+    Function to remove specified contact details from the addressbook
+    Returns 
+    """
     # Have we got a name to remove?
     if name:
         # Try to open the current addressbook and find the contact index
@@ -84,19 +100,25 @@ def remove_contact(filepath, name):
 
         if contact:
             with open(filepath, 'w') as outfile:
-                # Write the output file with the contact removed
-                print(outfile)
                 # If contact was found delete it
                 addressbook['contacts'].remove(contact)
-                print(addressbook)
                 json.dump(addressbook, outfile)
                 print('Contact: ', contact, ' removed.\n')
 
 def help():
+    """
+    Function to display the command line help
+    Returns 
+    """
     cmd_help = 'address-cli.py -h -i <input file> -l -a -r -f <contact to find>"'
     print(cmd_help)
 
 def process_options(argv, inputfile):
+    """
+    Function to determine what option were spefied
+    only the last action is used. Setting the file name always gets handled.
+    Returns options that are selected including the last action, file path and contact name
+    """
     action = ''
     contact = ''
     options = {}
