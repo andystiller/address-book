@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Simplified address application application
 This is the version just uses standard serialisation to text files
@@ -6,7 +6,10 @@ This is the version just uses standard serialisation to text files
 
 import os, sys, getopt, json
 
-FILE_PATH = "data/contacts.ab"
+FILE_PATH = "data/contacts.json"
+
+def process_addressbook(address_file):
+    pass
 
 def list_addresses(filepath):
     path_exists = os.path.exists(filepath)
@@ -25,21 +28,35 @@ def find_address(filepath, contact):
     pass
 
 def add_address(filepath):
-    contact = {}
+    new_contact = {}
     print(filepath)
+    path_exists = os.path.exists(filepath)
 
     fullname = input('Please enter the contact name: ')
     print(fullname)
 
-    #if not fullname:
-    contact['name'] = fullname
-    contact['phone'] = str(input('Please enter their phone number: '))
-    contact['address'] = input('Please enter their address: ')
+    if path_exists:
+        open_mode = 'r+'
+    else:
+        print('Creating new address book')
+        contacts = []
+        addressbook = {'filetype':'Addressbook','application':'address-cli.py', 'contacts': contacts}
+        open_mode = 'w'
 
-    print(contact)
-    with open(filepath, 'a') as outfile:
-        print(outfile)
-        json.dump(contact, outfile)
+    if fullname:
+        new_contact['name'] = fullname
+        new_contact['phone'] = str(input('Please enter their phone number: '))
+        new_contact['address'] = input('Please enter their address: ')
+
+        print(new_contact)
+        with open(filepath, open_mode) as outfile:
+            print(outfile)
+            if path_exists:
+                addressbook = json.load(outfile)
+            
+            addressbook['contacts'].append(new_contact)
+            print(addressbook)
+            json.dump(addressbook, outfile)
 
 
 def remove_address(filepath, contact):
@@ -77,6 +94,11 @@ def process_options(argv, inputfile):
             action = 'find'
             contact = arg
 
+    if action == '':
+        #If there are no actions display the help and quit the program
+        help()
+        sys.exit(2)
+
     options['filepath'] = inputfile
     options['action'] = action
     options['contact'] = contact
@@ -95,7 +117,8 @@ def main(argv):
         add_address(options['filepath'])
     elif options['action'] == 'remove':
         remove_address(options['filepath'], options['contact'])
-    elif options['find'] == 'find':
+    elif options['action'] == 'find':
         find_address(options['filepath'], options['contact'])
+        
 if __name__ == "__main__":
    main(sys.argv[1:])
