@@ -77,27 +77,46 @@ class AddressDatabase(object):
 
     def update_email(self, contact_id, email_details):
         """
-        Method to insert, update or remove a contact in the dabase.
+        Method to insert, update or remove a contact in the database.
         """
         pass
 
     def update_address(self, contact_id, address_details):
         """
-        Method to insert, update or remove a contact in the dabase.
+        Method to insert, update or remove a contact in the database.
         """
         pass
     
     def update_phone(self, contact_id, phone_details):
         """
-        Method to insert, update or remove a contact in the dabase.
+        Method to insert, update or remove a contact in the database.
         """
         pass
 
     def get_contact(self, contact_name):
         """
-        Method to insert, update or remove a contact in the dabase.
+        Method to return a contact from the dabase.
         """
         pass
+
+    def get_contact_id(self, contact_name):
+        """
+        Method to return a contact ID from a contact name.
+        """
+        contact_id = -1
+        cursor = self._db_conn.cursor()
+        print(contact_name['first_name'], contact_name['last_name'])
+        cursor.execute('''SELECT contact_id FROM contacts WHERE first_name LIKE ? AND last_name LIKE ?''', 
+            (contact_name['first_name'], contact_name['last_name']))
+        
+        rows = cursor.fetchall()
+
+        #If we just have one contact returned get the contact_id
+        if len(rows) == 1:
+            contact_id = rows[0][0]
+            
+        return contact_id
+
 
     @property
     def addressbook(self):
@@ -120,6 +139,7 @@ def main():
         new_contact['email'] = 'email'
         new_contact['address'] = 'Here'
         addressbook.update_contact(new_contact,'insert')
+        print(addressbook.get_contact_id(new_contact))
 
 if __name__ == "__main__":
     main()
