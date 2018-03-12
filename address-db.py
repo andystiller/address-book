@@ -93,29 +93,33 @@ class AddressDatabase(object):
         """
         pass
 
-    def get_contact(self, contact_name):
+    def get_contact_by_name(self, contact_name):
         """
         Method to return a contact from the dabase.
         """
-        pass
+        contact = None
+        result = {}
+        success = False
 
-    def get_contact_id(self, contact_name):
-        """
-        Method to return a contact ID from a contact name.
-        """
-        contact_id = -1
         cursor = self._db_conn.cursor()
         print(contact_name['first_name'], contact_name['last_name'])
-        cursor.execute('''SELECT contact_id FROM contacts WHERE first_name LIKE ? AND last_name LIKE ?''', 
+        cursor.execute('''SELECT * FROM contacts WHERE first_name LIKE ? AND last_name LIKE ?''', 
             (contact_name['first_name'], contact_name['last_name']))
         
         rows = cursor.fetchall()
 
+        num_rows = len(rows)
+        result['rows'] = num_rows
+
         #If we just have one contact returned get the contact_id
-        if len(rows) == 1:
-            contact_id = rows[0][0]
-            
-        return contact_id
+        if num_rows == 1:
+            contact = rows[0]
+            success = True
+        
+        result['success'] = success
+        result['contact'] = contact
+        
+        return result
 
 
     @property
@@ -139,7 +143,7 @@ def main():
         new_contact['email'] = 'email'
         new_contact['address'] = 'Here'
         addressbook.update_contact(new_contact,'insert')
-        print(addressbook.get_contact_id(new_contact))
+        print(addressbook.get_contact_by_name(new_contact))
 
 if __name__ == "__main__":
     main()
