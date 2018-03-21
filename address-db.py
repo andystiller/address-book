@@ -44,11 +44,38 @@ class AddressDatabase(object):
             self._db_conn.execute('''CREATE TABLE  IF NOT EXISTS contacts
                             ( contact_id INTEGER PRIMARY KEY,
                             first_name TEXT,
-                            last_name TEXT, 
-                            phone TEXT, 
-                            email TEXT,
-                            address TEXT
+                            last_name TEXT
                             )''')
+            self._db_conn.commit()
+
+            self._db_conn.execute('''CREATE TABLE IF NOT EXISTS address 
+                            ( address_id INTEGER PRIMARY KEY, 
+                            contact_id INTEGER, 
+                            street TEXT, 
+                            address_2 TEXT, 
+                            address_3 TEXT, 
+                            town TEXT, 
+                            county TEXT, 
+                            postcode TEXT, 
+                            FOREIGN KEY(contact_id) REFERENCES contacts(contact_id) 
+                            )''')
+
+            self._db_conn.execute('''CREATE TABLE IF NOT EXISTS phone 
+                            ( phone_id INTEGER PRIMARY KEY, 
+                            contact_id INTEGER, 
+                            phone_number TEXT, 
+                            type TEXT, 
+                            FOREIGN KEY(contact_id) REFERENCES contacts(contact_id)
+                             )''')
+
+            self._db_conn.execute('''CREATE TABLE IF NOT EXISTS email 
+                            ( email_id INTEGER PRIMARY KEY, 
+                            contact_id INTEGER, 
+                            email_address TEXT, 
+                            type TEXT, 
+                            FOREIGN KEY(contact_id) REFERENCES contacts(contact_id)
+                             )''')
+            self._db_conn.commit()
 
     def table_exists(self, table_name):
         """
@@ -71,23 +98,31 @@ class AddressDatabase(object):
         """
         cursor = self._db_conn.cursor()
         if action == 'insert':
-            cursor.execute('''INSERT INTO contacts(first_name, last_name, phone, email, address) VALUES(?,?,?,?,?)''', 
-                    (contact['first_name'], contact['last_name'], contact['phone'], contact['email'], contact['address']))
+            cursor.execute('''INSERT INTO contacts(first_name, last_name) VALUES(?,?)''', 
+                    (contact['first_name'], contact['last_name']))
         self._db_conn.commit()
 
-    def update_email(self, contact_id, email_details):
+        return cursor.lastrowid
+
+    def update_email(self, contact_id, email_details, action):
         """
         Method to insert, update or remove a contact in the database.
         """
-        pass
+        cursor = self._db_conn.cursor()
+        if action == 'insert':
+            cursor.execute('''INSERT INTO email(contact_id, email_address, type) VALUES(?,?,?)''', 
+                    (contact_id, email_details['email_address'], email_details['type']))
+        self._db_conn.commit()
 
-    def update_address(self, contact_id, address_details):
+        return cursor.lastrowid
+
+    def update_address(self, contact_id, address_details, action):
         """
         Method to insert, update or remove a contact in the database.
         """
         pass
     
-    def update_phone(self, contact_id, phone_details):
+    def update_phone(self, contact_id, phone_details, action):
         """
         Method to insert, update or remove a contact in the database.
         """
@@ -137,12 +172,14 @@ def main():
             print('Contacts table exists')
         
         new_contact = {}
+        new_email = {}
         new_contact['first_name'] = 'Andy'
         new_contact['last_name'] = 'Stiller'
-        new_contact['phone'] = '0'
-        new_contact['email'] = 'email'
-        new_contact['address'] = 'Here'
-        addressbook.update_contact(new_contact,'insert')
+        new_email['email_address'] = 'email@somewhere.local'
+        new_email['type'] = 'home'
+        contact_id = addressbook.update_contact(new_contact,'insert')
+        print(contact_id)
+        print(addressbook.update_email(contact_id, new_email,'insert'))
         print(addressbook.get_contact_by_name(new_contact))
 
 if __name__ == "__main__":
