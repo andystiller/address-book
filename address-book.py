@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import tkinter as tk
+from tkinter import ttk
 
 class AddressBookApp(tk.Frame):
     def __init__(self, master=None):
@@ -10,12 +11,14 @@ class AddressBookApp(tk.Frame):
         self._create_widgets()
 
     def _create_widgets(self):
-        listbox_entries = ["Entry 1", "Entry 2",
+        tree_view_entries = ["Entry 1", "Entry 2",
                    "Entry 3", "Entry 4"]
-        listbox_widget = tk.Listbox(self.master)
-        for entry in listbox_entries:
-            listbox_widget.insert(tk.END, entry)
-        listbox_widget.pack()
+        treeview_widget = ttk.Treeview(self.master)
+        index = 1
+        for entry in tree_view_entries:
+            treeview_widget.insert('', 'end', index, text = entry)
+            index += 1 
+        treeview_widget.pack()
         self._create_menus()
 
     
