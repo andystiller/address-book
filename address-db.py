@@ -37,7 +37,7 @@ class AddressDatabase(object):
 
     def createdb(self):
         """
-        Method to create the blank tables in the dabase.
+        Method to create the blank tables in the database.
         """
         #Create contacts table
         with self._db_conn:
@@ -79,7 +79,7 @@ class AddressDatabase(object):
 
     def table_exists(self, table_name):
         """
-        Method to create check whether a table is in the dabase.
+        Method to create check whether a table is in the database.
         """
         cursor = self._db_conn.cursor()
         exists = False
@@ -94,7 +94,7 @@ class AddressDatabase(object):
 
     def update_contact(self, contact, action):
         """
-        Method to insert, update or remove a contact in the dabase.
+        Method to insert, update or remove a contact in the database.
         """
         cursor = self._db_conn.cursor()
         if action == 'insert':
@@ -130,7 +130,7 @@ class AddressDatabase(object):
 
     def get_contact_by_name(self, contact_name):
         """
-        Method to return a contact from the dabase.
+        Method to return a contact from the database.
         """
         contact = None
         result = {}
