@@ -25,7 +25,8 @@ class AddressDatabase(object):
 
     def open_db(self):
         """
-        Method to open the database and create it if required 
+        Method to open the database or create it if required.
+        Returns true if the datbase already exists
         """
         path_exists = os.path.exists(self._db_path)
 
@@ -35,19 +36,22 @@ class AddressDatabase(object):
         if not path_exists:
             self.createdb()
 
+        return path_exists
+
     def createdb(self):
         """
-        Method to create the blank tables in the database.
+        Method to create the tables in the database.
         """
-        #Create contacts table
         with self._db_conn:
+            # Create contacts table
             self._db_conn.execute('''CREATE TABLE  IF NOT EXISTS contacts
                             ( contact_id INTEGER PRIMARY KEY,
                             first_name TEXT,
                             last_name TEXT
                             )''')
             self._db_conn.commit()
-
+            
+            # Create address, phone and email tables
             self._db_conn.execute('''CREATE TABLE IF NOT EXISTS address 
                             ( address_id INTEGER PRIMARY KEY, 
                             contact_id INTEGER, 
@@ -80,6 +84,7 @@ class AddressDatabase(object):
     def table_exists(self, table_name):
         """
         Method to create check whether a table is in the database.
+        Returns True if the table exists.
         """
         cursor = self._db_conn.cursor()
         exists = False
@@ -94,18 +99,17 @@ class AddressDatabase(object):
 
     def update_contact(self, contact):
         """
-        Method to update a contact in the database.
+        Method to update a contact in the database. 
         """
         cursor = self._db_conn.cursor()
         cursor.execute('''UPDATE contacts SET first_name = ?, SET last_name = ? WHERE contact_id = ?''', 
                 (contact['first_name'], contact['last_name'], contact['id']))
         self._db_conn.commit()
 
-        return cursor.lastrowid
-
     def insert_contact(self, contact):
         """
         Method to add a contact in the database.
+        Returns the last row ID (contact_id).
         """
         cursor = self._db_conn.cursor()
         cursor.execute('''INSERT INTO contacts(first_name, last_name) VALUES(?,?)''', 
@@ -143,7 +147,7 @@ class AddressDatabase(object):
         return cursor.lastrowid
         pass
 
-    def remove_email(self, email_details):
+    def remove_email(self, email_id):
         """
         Method to remove email details in the database.
         """
@@ -151,7 +155,19 @@ class AddressDatabase(object):
 
     def insert_address(self, contact_id, address_details):
         """
-        Method to insert, update or remove a contact in the database.
+        Method to insert address details in the database.
+        """
+        pass
+
+    def update_address(self, address_details):
+        """
+        Method to update address details in the database.
+        """
+        pass
+
+    def remove_address(self, address_id):
+        """
+        Method to remove address details in the database.
         """
         pass
     
@@ -176,6 +192,11 @@ class AddressDatabase(object):
     def get_contact_by_name(self, contact_name):
         """
         Method to return a contact from the database.
+        Returns a dictionary containing:
+        result['rows']     Rows found in teh databse
+        result['num_rows'] Number of rows returned
+        result['success']  True if 1 contact is found 
+        result['contact']  The contact details if 1 found or None
         """
         contact = None
         result = {}
