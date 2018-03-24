@@ -92,39 +92,84 @@ class AddressDatabase(object):
 
         return exists
 
-    def update_contact(self, contact, action):
+    def update_contact(self, contact):
         """
-        Method to insert, update or remove a contact in the database.
+        Method to update a contact in the database.
         """
         cursor = self._db_conn.cursor()
-        if action == 'insert':
-            cursor.execute('''INSERT INTO contacts(first_name, last_name) VALUES(?,?)''', 
-                    (contact['first_name'], contact['last_name']))
+        cursor.execute('''UPDATE contacts SET first_name = ?, SET last_name = ? WHERE contact_id = ?''', 
+                (contact['first_name'], contact['last_name'], contact['id']))
         self._db_conn.commit()
 
         return cursor.lastrowid
 
-    def update_email(self, contact_id, email_details, action):
+    def insert_contact(self, contact):
         """
-        Method to insert, update or remove a contact in the database.
+        Method to add a contact in the database.
         """
         cursor = self._db_conn.cursor()
-        if action == 'insert':
-            cursor.execute('''INSERT INTO email(contact_id, email_address, type) VALUES(?,?,?)''', 
-                    (contact_id, email_details['email_address'], email_details['type']))
+        cursor.execute('''INSERT INTO contacts(first_name, last_name) VALUES(?,?)''', 
+                (contact['first_name'], contact['last_name']))
         self._db_conn.commit()
 
         return cursor.lastrowid
 
-    def update_address(self, contact_id, address_details, action):
+    def remove_contact(self, contact_id):
+        """
+        Method to remove a contact in the database.
+        """
+        pass
+
+    def insert_email(self, contact_id, email_details):
+        """
+        Method to insert a contact in the database.
+        """
+        cursor = self._db_conn.cursor()
+        cursor.execute('''INSERT INTO email(contact_id, email_address, type) VALUES(?,?,?)''', 
+                (contact_id, email_details['email_address'], email_details['type']))
+        self._db_conn.commit()
+
+        return cursor.lastrowid
+    
+    def update_email(self, email_details):
+        """
+        Method to update email details in the database.
+        """
+        cursor = self._db_conn.cursor()
+        cursor.execute('''UPDATE email SET email_address = ?, SET type = ? WHERE email_id = ?''', 
+                (email_details['email_address'], email_details['type'], conemail_detailstact['id']))
+        self._db_conn.commit()
+
+        return cursor.lastrowid
+        pass
+
+    def remove_email(self, email_details):
+        """
+        Method to remove email details in the database.
+        """
+        pass
+
+    def insert_address(self, contact_id, address_details):
         """
         Method to insert, update or remove a contact in the database.
         """
         pass
     
-    def update_phone(self, contact_id, phone_details, action):
+    def insert_phone(self, contact_id, phone_details):
         """
-        Method to insert, update or remove a contact in the database.
+        Method to insert phone details in the database.
+        """
+        pass
+
+    def update_phone(self, phone_details):
+        """
+        Method to update phone details in the database.
+        """
+        pass
+
+    def remove_phone(self, phone_id):
+        """
+        Method to remove phone details in the database.
         """
         pass
 
@@ -144,7 +189,8 @@ class AddressDatabase(object):
         rows = cursor.fetchall()
 
         num_rows = len(rows)
-        result['rows'] = num_rows
+        result['rows'] = rows
+        result['num_rows'] = num_rows
 
         #If we just have one contact returned get the contact_id
         if num_rows == 1:
@@ -156,13 +202,24 @@ class AddressDatabase(object):
         
         return result
 
-
     @property
     def addressbook(self):
-        """ Property to return the the full addressbook as list of contacts
+        """ Property to return the full addressbook as list of contacts
         """
         pass
-    
+
+    @property
+    def num_contacts(self):
+        """ Property to return the number of contacts in the addressbook
+        """
+        pass
+
+    @property
+    def contacts(self):
+        """ Property to return a list of contacts in the addressbook
+        """
+        pass
+
 def main():
     """
     Entry point for testing if the file is run on it's own.
@@ -177,9 +234,9 @@ def main():
         new_contact['last_name'] = 'Stiller'
         new_email['email_address'] = 'email@somewhere.local'
         new_email['type'] = 'home'
-        contact_id = addressbook.update_contact(new_contact,'insert')
+        contact_id = addressbook.insert_contact(new_contact)
         print(contact_id)
-        print(addressbook.update_email(contact_id, new_email,'insert'))
+        print(addressbook.insert_email(contact_id, new_email))
         print(addressbook.get_contact_by_name(new_contact))
 
 if __name__ == "__main__":
